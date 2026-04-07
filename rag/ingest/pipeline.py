@@ -4,15 +4,11 @@ class RAGIngestPipeline:
         self.loader = loader
         self.chunker = chunker
         self.embedding = embedding
-        self.store = store  # 👈 依赖抽象
+        self.store = store
 
     def run(self, docs_path):
 
         docs = self.loader(docs_path)
-
-        # 从 store 获取已有数据（避免重复）
-        existing_docs = self.store.get_all_docs()
-        existing_texts = set([d["text"] for d in existing_docs])
 
         new_chunks = 0
 
@@ -20,10 +16,6 @@ class RAGIngestPipeline:
             chunks = self.chunker.split(doc["content"])
 
             for i, chunk in enumerate(chunks):
-
-                if chunk in existing_texts:
-                    continue
-
                 vector = self.embedding.embed(chunk)
 
                 self.store.add({

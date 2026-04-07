@@ -1,4 +1,3 @@
-import json
 from tools.adapter.base import BaseToolAdapter
 
 

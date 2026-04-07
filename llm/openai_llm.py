@@ -3,8 +3,8 @@ from .base import BaseLLM
 
 
 class OpenAILLM(BaseLLM):
-    def __init__(self, api_key, model_name):
-        self.client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+    def __init__(self, api_key, model_name, base_url):
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
         self.model = model_name
 
     def chat(self, messages, **kwargs):
