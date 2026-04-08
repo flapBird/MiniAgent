@@ -104,6 +104,32 @@ Terminal UI <--> FastAPI Backend
 
 ---
 
+---
+## 🚀 快速开始（Quick Start）
+
+### 1. 克隆项目
+
+```bash
+git clone https://github.com/your-username/mini-agent.git
+cd mini-agent
+```
+### 2. 安装依赖
+poetry install
+
+### 3. 配置环境变量
+在项目根目录创建 .env 文件
+
+### 4. 启动服务
+poetry run uvicorn main:app 
+
+### 5. 打开前端页面
+浏览器访问：http://localhost:8000/
+
+
+poetry run uvicorn main:app 
+
+---
+
 ## 下一步可扩展方向
 1. 上下文压缩
 2. 子代理
