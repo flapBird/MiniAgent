@@ -2,14 +2,14 @@ from rag.ingest.pipeline import RAGIngestPipeline
 from rag.ingest.chunker import Chunker
 from rag.ingest.loader import load_documents
 from rag.retriever import Retriever
-from rag.store.memory import MemoryVectorStore
-from rag.embedding.openai import OpenAIEmbedding
+from rag.store.faiss_store import FaissVectorStore
+from rag.embedding.sentence_embed import LocalSentenceEmbedding
 from rag.reranker.cross_encoder import CrossEncoderReranker
 import os
 
-def build_rag(client):
-    embedding = OpenAIEmbedding(client)
-    store = MemoryVectorStore()
+def build_rag():
+    embedding = LocalSentenceEmbedding(model_name="BAAI/bge-small-zh")
+    store = FaissVectorStore(embedding.model.get_sentence_embedding_dimension())
 
     pipeline = RAGIngestPipeline(
         loader=load_documents,

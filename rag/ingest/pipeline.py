@@ -17,7 +17,6 @@ class RAGIngestPipeline:
 
             for i, chunk in enumerate(chunks):
                 vector = self.embedding.embed(chunk)
-
                 self.store.add({
                     "text": chunk,
                     "source": doc["source"],
@@ -25,7 +24,5 @@ class RAGIngestPipeline:
                 }, vector)
 
                 new_chunks += 1
-
-        self.store.save()
 
         return new_chunks

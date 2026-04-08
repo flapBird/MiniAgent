@@ -1,5 +1,5 @@
 from tools.base import BaseTool
-
+import json
 
 class RagTool(BaseTool):
     name = "rag_search"
@@ -30,16 +30,16 @@ class RagTool(BaseTool):
 
     def run(self, args):
         """
-        args: dict
-        {
-            "query": "...",
-            "top_k": 3
-        }
+            "arguments": {
+                "query": "孙悟空什么时候变身",
+                "top_k": 3
+            }
         """
 
         try:
-            query = args.get("query", "")
-            top_k = args.get("top_k", 3)
+            args_dict = json.loads(args)
+            query = args_dict.get("query", "")
+            top_k = args_dict.get("top_k", 3)
 
             if not query:
                 return "Query is empty"

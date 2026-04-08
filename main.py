@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from tools.adapter.openai import OpenAIToolAdapter
 from tools.adapter.claude import ClaudeToolAdapter
 from rag.ingest.builder import build_rag
-from openai import OpenAI
 import os, uuid
 
 
@@ -25,7 +24,7 @@ def main():
     )
 
     # 导入知识库
-    retriever = build_rag(OpenAI(api_key=api_key, base_url=base_url))
+    retriever = build_rag()
 
     # 加载工具
     tool_map, tool_schemas = get_all_tools(retriever)
