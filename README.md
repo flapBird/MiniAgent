@@ -125,8 +125,9 @@ poetry run uvicorn main:app
 ### 5. 打开前端页面
 浏览器访问：http://localhost:8000/
 
+![Demo](./assets/terminal-demo1.png)
 
-poetry run uvicorn main:app 
+![Demo](./assets/terminal-demo2.png)
 
 ---
 
