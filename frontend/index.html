@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Agent Terminal</title>
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #f5f5f5;
+            font-family: monospace;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #terminal {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        #inputBar {
+            display: flex;
+            padding: 5px;
+            background-color: #2d2d2d;
+        }
+        #userInput {
+            flex: 1;
+            background-color: #1e1e1e;
+            border: none;
+            color: #f5f5f5;
+            font-size: 14px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal"></div>
+    <div id="inputBar">
+        <span>&gt;&nbsp;</span>
+        <input type="text" id="userInput" autofocus />
+    </div>
+
+    <script src="/frontend/terminal.js"></script>
+</body>
+</html>

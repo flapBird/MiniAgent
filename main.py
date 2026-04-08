@@ -1,59 +1,56 @@
-from llm.factory import get_llm
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from agent.core import Agent
-from tools.init import get_all_tools
-from dotenv import load_dotenv
 from tools.adapter.openai import OpenAIToolAdapter
-from tools.adapter.claude import ClaudeToolAdapter
+from tools.init import get_all_tools
 from rag.ingest.builder import build_rag
-import os, uuid
+import os
+from dotenv import load_dotenv
 
+# ------------------ 环境变量 ------------------
+load_dotenv()
+provider = os.getenv("LLM_PROVIDER", "openai")  # 选择LLM提供商
+api_key = os.getenv("LLM_API_KEY")  # API Key
+base_url = os.getenv("LLM_BASE_URL", default="https://api.openai.com/v1")
+model_name = os.getenv("LLM_MODEL", default="openai/gpt-oss-20b")
 
-def main():
-    # 加载环境变量
-    load_dotenv()
+# ------------------ 初始化 LLM ------------------
+from llm.factory import get_llm
+llm = get_llm(
+    provider=provider.__str__(),
+    api_key=api_key,
+    model_name=os.getenv("LLM_MODEL", default="openai/gpt-oss-20b"),  # 模型名称
+    base_url=base_url
+)
 
-    # 加载LLM模型
-    provider = os.getenv("LLM_PROVIDER", "openai")  # 选择LLM提供商
-    api_key = os.getenv("LLM_API_KEY") #API Key
-    base_url = os.getenv("LLM_BASE_URL", default="https://api.openai.com/v1")  # API地址
-    llm = get_llm(
-        provider = provider.__str__(),
-        api_key = api_key,
-        model_name  = os.getenv("LLM_MODEL", default="openai/gpt-oss-20b"), # 模型名称
-        base_url = base_url
-    )
+# ------------------ 导入知识库 ------------------
+retriever = build_rag()
 
-    # 导入知识库
-    retriever = build_rag()
+# ------------------ 初始化工具 ------------------
+tool_map, tool_schemas = get_all_tools(retriever)
+if provider == "openai":
+    adapter = OpenAIToolAdapter(tool_map)
+else:
+    raise ValueError(f"Unsupported provider: {provider}")
 
-    # 加载工具
-    tool_map, tool_schemas = get_all_tools(retriever)
+# ------------------ 初始化 Agent ------------------
+agent = Agent(llm=llm, adapter=adapter, tool_map=tool_map, tools=tool_schemas)
 
-    # 适配工具
-    if provider == "openai":
-        adapter = OpenAIToolAdapter(tool_map)
-    elif provider == "claude":
-        adapter = ClaudeToolAdapter(tool_map)
-    else:
-        raise ValueError(f"Unsupported provider: {provider}")
+# ------------------ FastAPI ------------------
+app = FastAPI()
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 
-    agent = Agent(llm, adapter, tool_map, tool_schemas)
+@app.get("/", response_class=HTMLResponse)
+async def index():
+    with open("frontend/index.html", "r", encoding="utf-8") as f:
+        return f.read()
 
-    session_id = str(uuid.uuid4())
-
-    print("\n请输入对话，输入 'exit' 或 'quit' 退出。")
-
-    while True:
-        user_input = input("\n你: ")
-
-        if user_input.lower() in ["exit", "quit"]:
-            break
-
-        print("\nAI:", end=" ")
-        if user_input.__contains__("会议总结"):
-            print(agent.run(session_id, user_input,"meetinghelper"))
-        else:
-            print(agent.run(session_id, user_input))
-
-if __name__ == "__main__":
-    main()
+@app.post("/api/message")
+async def message(payload: dict):
+    session_id = payload.get("session_id", "default")
+    user_input = payload.get("user_input", "")
+    print("Received input:", user_input)
+    response = agent.run(session_id, user_input)
+    print("Agent response:", response)
+    return {"response": response}
