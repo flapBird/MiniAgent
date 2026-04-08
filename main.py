@@ -50,7 +50,10 @@ def main():
             break
 
         print("\nAI:", end=" ")
-        print(agent.run(session_id, user_input))
+        if user_input.__contains__("会议总结"):
+            print(agent.run(session_id, user_input,"meetinghelper"))
+        else:
+            print(agent.run(session_id, user_input))
 
 if __name__ == "__main__":
     main()
